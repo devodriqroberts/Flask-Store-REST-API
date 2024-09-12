@@ -2,7 +2,11 @@ import uuid
 from flask import request
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
-from db import stores
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+
+from db import db
+
+from models import StoreModel
 from schemas import StoreSchema, StoreUpdateSchema
 
 
@@ -10,53 +14,56 @@ blp = Blueprint("stores", __name__, description="Operations on stores.")
 
 @blp.route("/store/<string:store_id>")
 class Store(MethodView):
+    @blp.response(200, StoreSchema)
     def get(self, store_id):
-    # Get store; Check if store exists
-        try:
-            return stores[store_id], 200
-        except KeyError:
-            abort(404, message="Store not found.")
+        store = StoreModel.query.get_or_404(store_id)
+        return store, 200
 
     def delete(self, store_id):
-        # Delete store if store exists
-        try:
-            del stores[store_id]
-            return {"message": "Store deleted."}, 200
-        except KeyError:
-            abort(404, message="Store not found.")
+        store = StoreModel.query.get_or_404(store_id)
+        db.session.delete(store)
+        db.session.commit()
+        return {"message": "Store deleted."}
 
     @blp.arguments(StoreUpdateSchema)
     @blp.response(200, StoreSchema)
     def put(self, store_data, store_id):
-        # Get store if exists
-        try:
-            store = stores[store_id]
-        except KeyError:
-            abort(404, message="Store not found.")
+        store = StoreModel.query.get(store_id)
+        if store:
+            store.name = store_data["name"]
         else:
-            # Update store
-            store |= store_data
-            return store, 200
+            store = StoreModel(id=store_id, **store_data)
+
+        try:
+            db.session.add(store)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            abort(400, message="Store with that name already exists.")
+        else:
+            return store
 
 
 @blp.route("/store")
 class Store(MethodView):
     @blp.response(200, StoreSchema(many=True))
     def get(self):
-        return {"Stores": list(stores.values())}
+        return StoreModel.query.all()
     
     @blp.arguments(StoreSchema)
     @blp.response(201, StoreSchema)
     def post(self, store_data):
-        # Check if store already exist
-        for store in stores:
-            if store["name"] == store_data["name"]:
-                abort(400, "Bad request. Store already exist.")
+        # Create Store Models
+        store = StoreModel(**store_data)
 
-        # Create store UUID
-        store_id = uuid.uuid4().hex
-        # Create store
-        store = {"id": store_id, **store_data}
-        # Save store
-        stores[store_id] = store
-        return store, 201
+        try:
+            db.session.add(store)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            abort(400, message="Store with that name already exists.")
+        except SQLAlchemyError:
+            db.session.rollback()
+            abort(500, message="Error occurred while attempting to create store.")
+        else:
+            return store, 201
