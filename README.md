@@ -1,4 +1,3 @@
-
 # REST API with Flask, Docker, Flask-Smorest, and Flask-SQLAlchemy
 
 ## Features
@@ -7,8 +6,8 @@
 - **Flask-Smorest**: Simplifies API creation with built-in schema validation and error handling
 - **Flask-SQLAlchemy**: Object-relational mapper (ORM) for managing database models
 - **Docker**: For containerized development and deployment, ensuring a consistent environment across systems
-- **TODO** **JWT Authentication**: Secure access to API endpoints with token-based authentication
-- **TODO** **PostgreSQL/SQLite**: Database integration for structured data storage and retrieval
+- **JWT Authentication**: Secure access to API endpoints with token-based authentication
+- **PostgreSQL/SQLite**: Database integration for structured data storage and retrieval
 
 ## Project Setup
 

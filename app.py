@@ -4,6 +4,7 @@ import secrets
 from flask import Flask, jsonify
 from flask_smorest import Api
 from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate
 
 from db import db
 import models
@@ -31,6 +32,8 @@ def create_app(db_url=None):
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "90075260392040582662433033809774368280")
     db.init_app(app)
+
+    migrate = Migrate(app, db)
 
     api = Api(app)
 
@@ -88,9 +91,6 @@ def create_app(db_url=None):
             ),
             401,
         )
-
-    with app.app_context():
-        db.create_all()
 
     api.register_blueprint(ItemBlueprint)
     api.register_blueprint(StoreBlueprint)

@@ -2,5 +2,6 @@
 venv*
 .flaskenv
 __pycache__
+*.pyc
 /instance
-# data.db
+.DS_Store
