@@ -48,6 +48,7 @@ class Store(MethodView):
 
 @blp.route("/store")
 class Store(MethodView):
+    @jwt_required()
     @blp.response(200, StoreSchema(many=True))
     def get(self):
         return StoreModel.query.all()
