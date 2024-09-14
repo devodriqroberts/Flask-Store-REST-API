@@ -57,7 +57,7 @@ class LinkTagsToItem(MethodView):
             return tag
         
 
-    @jwt_required()
+    @jwt_required(fresh=True)
     @blp.response(200, TagAndItemSchema)
     def delete(self, item_id, tag_id):
         item = ItemModel.query.get_or_404(item_id)
@@ -82,7 +82,7 @@ class Tag(MethodView):
         tag = TagModel.query.get_or_404(tag_id)
         return tag
     
-
+    @jwt_required(fresh=True)
     @blp.response(202, description="Deletes a tag if no item is tagged with it.")
     @blp.alt_response(404, description="Tag not found.")
     @blp.alt_response(400, description="Returned if tag is assigned to one or more items. In this cas, the tag is not deleted.")
