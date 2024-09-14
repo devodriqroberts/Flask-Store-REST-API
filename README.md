@@ -59,7 +59,7 @@
 2. The API will be accessible at:
 
    ```
-   http://localhost:5000
+   http://localhost:5005
    ```
 
 #### Without Docker
@@ -84,14 +84,6 @@
 - **POST** `/login`: Authenticate and retrieve a JWT token
 - **GET** `/resource`: Access protected resources (JWT required)
 - **CRUD Operations** for managing various resources
-
-### Testing
-
-Run tests to ensure the application is working as expected:
-
-```bash
-pytest
-```
 
 ## Acknowledgments
 
