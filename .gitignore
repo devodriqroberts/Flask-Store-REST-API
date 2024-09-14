@@ -1,4 +1,6 @@
-.venv
+.venv*
+venv*
 .flaskenv
 __pycache__
-data.db
+/instance
+# data.db
